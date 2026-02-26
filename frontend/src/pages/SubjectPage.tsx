@@ -26,6 +26,7 @@ const SubjectPage = () => {
     queryFn: api.getYears,
   });
   const year = years.find((y) => y._id === yearId);
+  const isSkillCategory = year && year.order >= 5;
 
   // Fetch subject name
   const { data: subjects = [] } = useQuery({
@@ -53,7 +54,7 @@ const SubjectPage = () => {
           to={`/year/${yearId}/semester/${semesterId}`}
           className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
-          <ArrowLeft className="h-4 w-4" /> Back to Semester
+          <ArrowLeft className="h-4 w-4" /> Back to {isSkillCategory ? 'Topic' : 'Semester'}
         </Link>
       </motion.div>
 

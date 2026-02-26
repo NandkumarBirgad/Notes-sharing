@@ -6,6 +6,13 @@ import { api, Year } from '@/lib/api.ts';
 
 const yearIcons: Record<number, string> = { 0: '📘', 1: '📗', 2: '📙', 3: '📕' };
 
+const skillConfig: Record<string, { emoji: string; gradient: string; border: string; iconBg: string; textColor: string }> = {
+  DSA: { emoji: '🧠', gradient: 'from-violet-500 to-purple-600', border: 'border-violet-200 hover:border-violet-400', iconBg: 'bg-violet-100', textColor: 'text-violet-600' },
+  Programming: { emoji: '💻', gradient: 'from-cyan-500 to-blue-600', border: 'border-cyan-200 hover:border-cyan-400', iconBg: 'bg-cyan-100', textColor: 'text-cyan-600' },
+  Aptitude: { emoji: '🎯', gradient: 'from-amber-500 to-orange-600', border: 'border-amber-200 hover:border-amber-400', iconBg: 'bg-amber-100', textColor: 'text-amber-600' },
+  default: { emoji: '📚', gradient: 'from-gray-500 to-slate-600', border: 'border-border', iconBg: 'bg-muted', textColor: 'text-primary' },
+};
+
 const statItems = [
   { icon: FileText, label: 'Study Notes', value: '500+' },
   { icon: Download, label: 'Downloads', value: '12K+' },
@@ -163,7 +170,7 @@ const Index = () => {
             viewport={{ once: true, margin: "-100px" }}
             className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
           >
-            {years.map((year: Year, idx: number) => (
+            {years.filter((y: Year) => y.order <= 4).map((year: Year, idx: number) => (
               <motion.div key={year._id} variants={fadeUpItem} className="h-full">
                 <Link
                   to={`/year/${year._id}`}
@@ -186,7 +193,61 @@ const Index = () => {
         )}
       </section>
 
-      {/* 4. BOTTOM CTA */}
+      {/* 4. SKILL BUILDING RESOURCES (DSA, Programming, Aptitude) */}
+      {!isLoading && !isError && years.some((y: Year) => y.order >= 5) && (
+        <section className="container mx-auto px-4 py-16">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-4 py-1.5 text-sm font-medium text-emerald-600 mb-4">
+                <Sparkles className="h-4 w-4" />
+                <span>Skill Building</span>
+              </div>
+              <h2 className="font-display text-3xl font-bold tracking-tight mb-2">DSA, Programming & Aptitude</h2>
+              <p className="text-muted-foreground max-w-2xl">Sharpen your problem-solving skills, master programming languages, and ace aptitude tests with curated resources.</p>
+            </motion.div>
+          </div>
+
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: "-100px" }}
+            className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {years.filter((y: Year) => y.order >= 5).map((year: Year) => {
+              const config = skillConfig[year.name] ?? skillConfig.default;
+              return (
+                <motion.div key={year._id} variants={fadeUpItem} className="h-full">
+                  <Link
+                    to={`/year/${year._id}`}
+                    className={`group relative flex flex-col h-full overflow-hidden rounded-2xl border p-7 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${config.border}`}
+                  >
+                    {/* Gradient overlay */}
+                    <div className={`absolute inset-0 opacity-[0.06] bg-gradient-to-br ${config.gradient} pointer-events-none`} />
+                    <div className="relative z-10">
+                      <div className={`mb-5 flex h-14 w-14 items-center justify-center rounded-xl ${config.iconBg} transition-transform duration-300 group-hover:scale-110`}>
+                        <span className="text-3xl">{config.emoji}</span>
+                      </div>
+                      <h3 className="font-display text-xl font-bold mb-2">{year.name}</h3>
+                      <p className="text-sm text-muted-foreground flex-grow mb-6">{year.description}</p>
+                      <div className={`mt-auto flex items-center text-sm font-semibold ${config.textColor}`}>
+                        Explore Topics
+                        <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-2" />
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        </section>
+      )}
+
+      {/* 5. BOTTOM CTA */}
       <section className="container mx-auto px-4 py-24">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}

@@ -17,6 +17,7 @@ export const years = [
   { id: 2, label: '2nd Year', description: 'Core subject fundamentals', icon: '📗' },
   { id: 3, label: '3rd Year', description: 'Advanced & elective courses', icon: '📙' },
   { id: 4, label: '4th Year', description: 'Specialization & projects', icon: '📕' },
+  { id: 5, label: 'DSA', description: 'Data Structures & Algorithms', icon: '📘' },
 ];
 
 export const semesters = [
@@ -29,7 +30,7 @@ export const subjects: Record<string, string[]> = {
   '1-2': ['Mathematics II', 'Engineering Drawing', 'Data Structures', 'Digital Electronics', 'Environmental Science'],
   '2-1': ['Discrete Mathematics', 'Object-Oriented Programming', 'Computer Organization', 'Database Management', 'Operating Systems'],
   '2-2': ['Software Engineering', 'Computer Networks', 'Theory of Computation', 'Web Technologies', 'Statistics'],
-  '3-1': ['Compiler Design', 'Machine Learning', 'Information Security', 'Cloud Computing', 'Mobile App Development'],
+  '3-1': ['Database Management Systems', 'Machine Learning', 'Information Security', 'Cloud Computing', 'Mobile App Development'],
   '3-2': ['Artificial Intelligence', 'Big Data Analytics', 'IoT', 'Blockchain', 'Natural Language Processing'],
   '4-1': ['Deep Learning', 'Distributed Systems', 'Cyber Security', 'Project Work I', 'Elective I'],
   '4-2': ['Project Work II', 'Elective II', 'Elective III', 'Seminar', 'Internship'],

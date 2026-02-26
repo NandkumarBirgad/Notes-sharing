@@ -19,6 +19,7 @@ const SemesterPage = () => {
     queryFn: api.getYears,
   });
   const year = years.find((y) => y._id === yearId);
+  const isSkillCategory = year && year.order >= 5;
 
   // Fetch semesters to get current semester name
   const { data: semesters = [] } = useQuery({
@@ -44,8 +45,12 @@ const SemesterPage = () => {
       </motion.div>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mt-4">
-        <h1 className="font-display text-3xl font-bold">{year?.name ?? ''} — {semester?.name ?? 'Loading...'}</h1>
-        <p className="mt-1 text-muted-foreground">{subjects.length} subjects available</p>
+        <h1 className="font-display text-3xl font-bold">
+          {year?.name ?? ''} — {semester?.name ?? 'Loading...'}
+        </h1>
+        <p className="mt-1 text-muted-foreground">
+          {subjects.length} {isSkillCategory ? 'sub-topics' : 'subjects'} available
+        </p>
       </motion.div>
 
       {isLoading && (
@@ -56,7 +61,7 @@ const SemesterPage = () => {
 
       {isError && (
         <div className="mt-8 rounded-xl border border-destructive/50 bg-destructive/5 p-8 text-center">
-          <p className="font-medium text-destructive">Failed to load subjects. Make sure the backend is running.</p>
+          <p className="font-medium text-destructive">Failed to load {isSkillCategory ? 'sub-topics' : 'subjects'}. Make sure the backend is running.</p>
         </div>
       )}
 
@@ -82,8 +87,8 @@ const SemesterPage = () => {
 
           {subjects.length === 0 && (
             <div className="col-span-3 rounded-xl border border-dashed bg-muted/40 p-12 text-center">
-              <p className="font-medium text-muted-foreground">No subjects found for this semester.</p>
-              <p className="mt-1 text-sm text-muted-foreground/70">Add subjects via the admin API.</p>
+              <p className="font-medium text-muted-foreground">No {isSkillCategory ? 'sub-topics' : 'subjects'} found.</p>
+              <p className="mt-1 text-sm text-muted-foreground/70">Add {isSkillCategory ? 'sub-topics' : 'subjects'} via the admin API.</p>
             </div>
           )}
         </motion.div>
