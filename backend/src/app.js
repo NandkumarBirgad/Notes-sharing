@@ -14,7 +14,11 @@ const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 const app = express();
 
 // ─── Security & Logging ────────────────────────────────────────────────────
-app.use(helmet());
+app.use(helmet({
+  frameguard: false,
+  contentSecurityPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 const rawFrontendUrl = process.env.FRONTEND_URL;
 const frontendUrl = rawFrontendUrl ? rawFrontendUrl.replace(/\/$/, '') : null;
 
