@@ -58,6 +58,19 @@ app.get('/health', (req, res) => {
   });
 });
 
+app.get('/debug-pdf', (req, res) => {
+  try {
+    const pdf = require('pdf-parse');
+    res.json({
+      success: true,
+      typeOfPdf: typeof pdf,
+      keys: Object.keys(pdf),
+    });
+  } catch (err) {
+    res.json({ success: false, error: err.message });
+  }
+});
+
 
 // ─── API Routes ────────────────────────────────────────────────────────────
 app.use('/api/years', yearRoutes);
