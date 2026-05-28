@@ -3,7 +3,10 @@
 // In dev the Vite proxy rewrites "/api" → "http://localhost:5000/api".
 // In production set VITE_API_BASE_URL to your deployed backend.
 
-const BASE = import.meta.env.VITE_API_BASE_URL ?? import.meta.env.VITE_API_URL ?? "/api";
+let BASE = import.meta.env.VITE_API_BASE_URL ?? import.meta.env.VITE_API_URL ?? "/api";
+if (BASE !== "/api" && !BASE.endsWith("/api") && !BASE.endsWith("/api/")) {
+    BASE = BASE.replace(/\/$/, '') + "/api";
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
