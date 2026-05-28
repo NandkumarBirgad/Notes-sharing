@@ -15,21 +15,22 @@ const app = express();
 
 // ─── Security & Logging ────────────────────────────────────────────────────
 app.use(helmet());
-const allowedOrigins =
-  process.env.NODE_ENV === 'production'
-    ? [process.env.FRONTEND_URL].filter(Boolean)
-    : null; // null = allow all origins in development
+const rawFrontendUrl = process.env.FRONTEND_URL;
+const frontendUrl = rawFrontendUrl ? rawFrontendUrl.replace(/\/$/, '') : null;
 
 app.use(cors({
   origin: (origin, cb) => {
     // Allow requests with no origin (e.g. curl, Postman, same-origin)
     if (!origin) return cb(null, true);
-    // In development, allow any localhost origin (any port)
-    if (!allowedOrigins) {
-      if (/^https?:\/\/localhost(:\d+)?$/.test(origin)) return cb(null, true);
+    
+    // Allow localhost in development or production
+    if (/^https?:\/\/localhost(:\d+)?$/.test(origin)) return cb(null, true);
+    
+    // Automatically allow any Vercel subdomain or matches FRONTEND_URL
+    if (origin.endsWith('.vercel.app') || (frontendUrl && origin === frontendUrl)) {
+      return cb(null, true);
     }
-    // In production, check against whitelist
-    if (allowedOrigins && allowedOrigins.includes(origin)) return cb(null, true);
+    
     cb(new Error(`Origin ${origin} not allowed by CORS`));
   },
   credentials: true,
