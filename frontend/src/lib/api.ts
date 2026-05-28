@@ -130,6 +130,10 @@ export const api = {
             { method: "POST" }
         ).then((r) => r.data),
 
+    // Get Single Resource details directly by ID
+    getSingleResource: (resourceId: string) =>
+        request<SuccessResponse<Resource>>(`/resources/single/${resourceId}`).then((r) => r.data),
+
     // AI Chat
     chat: (resourceId: string, question: string, history: Array<{ role: "user" | "model"; content: string }>) =>
         request<SuccessResponse<{ answer: string }>>(

@@ -30,29 +30,16 @@ const ViewPage = () => {
   const [resource, setResource] = useState<Resource | null>(null);
   const [loadingResource, setLoadingResource] = useState(true);
 
-  // Fetch resources using standard list and search for the target resource
+  // Fetch resource details directly by ID
   useEffect(() => {
     const fetchTargetResource = async () => {
       if (!resourceId) return;
       try {
         setLoadingResource(true);
-        // We can use the adminListAll or list all from admin to find it
-        // Or since we have mock data, we can query resources. Let's make an API call
-        // Wait, to bypass auth, let's fetch all uploads using an empty or try finding
-        const allUploads = await api.search('').catch(() => []);
-        const found = allUploads.find((r: Resource) => r._id === resourceId);
-        
-        if (found) {
-          setResource(found);
-          if (found.aiSummary) setAiSummary(found.aiSummary);
-        } else {
-          // If not found in search, try fetching via admin list fallback (silent)
-          const adminUploads = await api.adminListAll('Nandkumar').catch(() => []);
-          const adminFound = adminUploads.find((r: Resource) => r._id === resourceId);
-          if (adminFound) {
-            setResource(adminFound);
-            if (adminFound.aiSummary) setAiSummary(adminFound.aiSummary);
-          }
+        const data = await api.getSingleResource(resourceId);
+        if (data) {
+          setResource(data);
+          if (data.aiSummary) setAiSummary(data.aiSummary);
         }
       } catch (err: any) {
         console.error('Error fetching resource details:', err.message);

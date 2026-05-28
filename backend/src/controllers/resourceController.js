@@ -191,6 +191,17 @@ const chatAboutResource = asyncHandler(async (req, res) => {
   sendSuccess(res, { answer }, 'Answer generated successfully');
 });
 
+// ─── GET /resources/single/:id  [public] ─────────────────────────────────
+const getSingleResource = asyncHandler(async (req, res) => {
+  const resource = await Resource.findById(req.params.id)
+    .populate('yearId', 'name')
+    .populate('semesterId', 'name')
+    .populate('subjectId', 'name code');
+  
+  if (!resource) return sendError(res, 'Resource not found', 404);
+  sendSuccess(res, resource, 'Resource fetched successfully');
+});
+
 module.exports = {
   getResources,
   uploadResource,
@@ -200,4 +211,5 @@ module.exports = {
   listAllUploads,
   summarizeResource,
   chatAboutResource,
+  getSingleResource,
 };
