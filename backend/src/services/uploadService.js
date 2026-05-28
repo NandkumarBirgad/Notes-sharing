@@ -82,7 +82,9 @@ const getUploader = () => {
 
 // ─── Helper: build file URLs for local storage ────────────────────────────
 const getLocalFileUrl = (req, filename) => {
-  return `${req.protocol}://${req.get('host')}/uploads/${filename}`;
+  const host = req.get('host');
+  const protocol = host.includes('localhost') ? req.protocol : 'https';
+  return `${protocol}://${host}/uploads/${filename}`;
 };
 
 // ─── Helper: delete a file ────────────────────────────────────────────────
