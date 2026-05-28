@@ -228,12 +228,17 @@ async function seed() {
             const semesterId = semMap[`${r.yearOrder}-${r.semOrder}`];
             const subjectId = subjMap[`${r.yearOrder}-${r.semOrder}-${r.subject}`];
 
+            const isVideo = r.type === 'video';
+            const sampleUrl = isVideo 
+                ? 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4'
+                : 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf';
+
             return {
                 title: r.title,
                 description: r.description,
                 type: r.type,
-                fileUrl: '#',                    // placeholder URL
-                previewUrl: '#',
+                fileUrl: sampleUrl,
+                previewUrl: sampleUrl,
                 publicId: '',
                 fileSize: 0,
                 fileType: r.fileType,
