@@ -133,7 +133,10 @@ export const api = {
         }).then(async (res) => {
             if (!res.ok) {
                 const body = await res.json().catch(() => ({}));
-                throw new Error(body.message || "Upload failed");
+                const errMsg = body.errors && body.errors.length > 0 
+                    ? `Validation failed: ${body.errors.map((e: any) => e.msg).join(', ')}`
+                    : (body.message || "Upload failed");
+                throw new Error(errMsg);
             }
             return res.json() as Promise<SuccessResponse<Resource>>;
         }),

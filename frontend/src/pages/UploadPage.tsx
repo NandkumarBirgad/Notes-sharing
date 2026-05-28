@@ -49,6 +49,22 @@ const UploadPage = () => {
       toast({ title: 'Error', description: 'Please select a file.', variant: 'destructive' });
       return;
     }
+    if (!yearId) {
+      toast({ title: 'Error', description: 'Please select an Academic Year.', variant: 'destructive' });
+      return;
+    }
+    if (!semesterId) {
+      toast({ title: 'Error', description: 'Please select a Semester or Topic.', variant: 'destructive' });
+      return;
+    }
+    if (!subjectId) {
+      toast({ title: 'Error', description: 'Please select a Subject.', variant: 'destructive' });
+      return;
+    }
+    if (!fileType) {
+      toast({ title: 'Error', description: 'Please select a File Type.', variant: 'destructive' });
+      return;
+    }
     if (!adminKey) {
       toast({ title: 'Error', description: 'Admin API key is required.', variant: 'destructive' });
       return;
