@@ -199,7 +199,10 @@ const ViewPage = () => {
               />
             ) : (
               <iframe
-                src={resource.fileUrl}
+                src={resource.fileUrl.includes('localhost')
+                  ? resource.fileUrl
+                  : `https://docs.google.com/viewer?url=${encodeURIComponent(resource.fileUrl)}&embedded=true`
+                }
                 title={resource.title}
                 className="w-full h-full border-none"
                 loading="lazy"
