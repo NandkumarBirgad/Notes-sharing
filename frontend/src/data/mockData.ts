@@ -29,9 +29,9 @@ export const subjects: Record<string, string[]> = {
   '1-1': ['Mathematics I', 'Physics', 'Chemistry', 'English', 'Programming in C'],
   '1-2': ['Mathematics II', 'Engineering Drawing', 'Data Structures', 'Digital Electronics', 'Environmental Science'],
   '2-1': ['Discrete Mathematics', 'Object-Oriented Programming', 'Computer Organization', 'Database Management', 'Operating Systems'],
-  '2-2': ['Software Engineering', 'Computer Networks', 'Theory of Computation', 'Web Technologies', 'Statistics'],
+  '2-2': ['Software Engineering', 'Computer Networks', 'Theory of Computation', 'Web Technologies', 'Human Computer Interaction'],
   '3-1': ['Database Management Systems', 'Machine Learning', 'Information Security', 'Cloud Computing', 'Mobile App Development'],
-  '3-2': ['Artificial Intelligence', 'Big Data Analytics', 'IoT', 'Blockchain', 'Natural Language Processing'],
+  '3-2': ['Compiler Design', 'Machine Learning', 'IoT', 'Computer Networking', 'Employebility skills'],
   '4-1': ['Deep Learning', 'Distributed Systems', 'Cyber Security', 'Project Work I', 'Elective I'],
   '4-2': ['Project Work II', 'Elective II', 'Elective III', 'Seminar', 'Internship'],
 };
