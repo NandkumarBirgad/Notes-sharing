@@ -12,6 +12,7 @@ import SubjectPage from "./pages/SubjectPage";
 import UploadPage from "./pages/UploadPage";
 import AdminPage from "./pages/AdminPage";
 import SearchPage from "./pages/SearchPage";
+import ViewPage from "./pages/ViewPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/upload" element={<UploadPage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/view/:resourceId" element={<ViewPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />

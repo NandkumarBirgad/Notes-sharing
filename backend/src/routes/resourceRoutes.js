@@ -7,6 +7,8 @@ const {
   updateResource,
   incrementDownload,
   listAllUploads,
+  summarizeResource,
+  chatAboutResource,
 } = require('../controllers/resourceController');
 const adminAuth  = require('../middleware/adminAuth');
 const { resourceUploadRules, resourceUpdateRules, mongoIdParam, validate } =
@@ -18,6 +20,8 @@ const upload = getUploader();
 // Public
 router.get('/:subjectId',          mongoIdParam('subjectId'), validate, getResources);
 router.patch('/:id/download',      mongoIdParam('id'),        validate, incrementDownload);
+router.post('/:id/summarize',      mongoIdParam('id'),        validate, summarizeResource);
+router.post('/:id/chat',           mongoIdParam('id'),        validate, chatAboutResource);
 
 // Admin
 router.post('/upload',   adminAuth, upload.single('file'), resourceUploadRules, validate, uploadResource);

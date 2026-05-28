@@ -135,6 +135,62 @@ const listAllUploads = asyncHandler(async (req, res) => {
   sendPaginated(res, resources, total, page, limit, 'All uploads fetched');
 });
 
+// ─── POST /resources/:id/summarize  [public] ──────────────────────────────
+const { extractTextFromPdf, generateSummary, chatWithPdf } = require('../services/aiService');
+
+const summarizeResource = asyncHandler(async (req, res) => {
+  const resource = await Resource.findById(req.params.id);
+  if (!resource) return sendError(res, 'Resource not found', 404);
+
+  if (resource.type === 'video') {
+    return sendError(res, 'AI summaries are only supported for text documents (PDFs/papers), not videos.', 400);
+  }
+
+  // 1. Return cached summary if already generated (saves Gemini API quota!)
+  if (resource.aiSummary) {
+    return sendSuccess(res, { aiSummary: resource.aiSummary }, 'Summary fetched from cache');
+  }
+
+  // 2. Extract PDF text
+  const text = await extractTextFromPdf(resource.fileUrl);
+  if (!text) {
+    return sendError(res, 'Could not extract text from this document. It might be scanned or empty.', 400);
+  }
+
+  // 3. Generate summary using Gemini AI
+  const summary = await generateSummary(text);
+
+  // 4. Cache it in database
+  resource.aiSummary = summary;
+  await resource.save();
+
+  sendSuccess(res, { aiSummary: summary }, 'Summary generated successfully with Gemini AI');
+});
+
+// ─── POST /resources/:id/chat  [public] ────────────────────────────────────
+const chatAboutResource = asyncHandler(async (req, res) => {
+  const { question, history = [] } = req.body;
+  if (!question) return sendError(res, 'Question is required', 400);
+
+  const resource = await Resource.findById(req.params.id);
+  if (!resource) return sendError(res, 'Resource not found', 404);
+
+  if (resource.type === 'video') {
+    return sendError(res, 'AI Chat is only supported for text documents, not videos.', 400);
+  }
+
+  // Extract PDF text
+  const text = await extractTextFromPdf(resource.fileUrl);
+  if (!text) {
+    return sendError(res, 'Could not extract text from this document.', 400);
+  }
+
+  // Chat with the document content using Gemini AI
+  const answer = await chatWithPdf(text, question, history);
+
+  sendSuccess(res, { answer }, 'Answer generated successfully');
+});
+
 module.exports = {
   getResources,
   uploadResource,
@@ -142,4 +198,6 @@ module.exports = {
   updateResource,
   incrementDownload,
   listAllUploads,
+  summarizeResource,
+  chatAboutResource,
 };

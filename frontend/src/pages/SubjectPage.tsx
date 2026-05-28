@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Download, FileText, FileVideo, FilePen, Eye, Loader2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -116,6 +116,7 @@ const itemAnim = {
 
 function MaterialList({ items, type }: { items: Resource[]; type: 'note' | 'paper' | 'video' }) {
   const config = typeConfig[type];
+  const navigate = useNavigate();
 
   const handleDownload = async (resource: Resource) => {
     try {
@@ -169,7 +170,7 @@ function MaterialList({ items, type }: { items: Resource[]; type: 'note' | 'pape
               variant="outline"
               size="sm"
               className="transition-transform duration-200 hover:scale-105"
-              onClick={() => window.open(item.previewUrl || item.fileUrl, '_blank')}
+              onClick={() => navigate(`/view/${item._id}`)}
             >
               <Eye className="mr-1.5 h-3.5 w-3.5" /> Preview
             </Button>

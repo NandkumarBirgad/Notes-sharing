@@ -123,6 +123,23 @@ export const api = {
             (r) => r.data
         ),
 
+    // AI Summarize
+    summarize: (resourceId: string) =>
+        request<SuccessResponse<{ aiSummary: string }>>(
+            `/resources/${resourceId}/summarize`,
+            { method: "POST" }
+        ).then((r) => r.data),
+
+    // AI Chat
+    chat: (resourceId: string, question: string, history: Array<{ role: "user" | "model"; content: string }>) =>
+        request<SuccessResponse<{ answer: string }>>(
+            `/resources/${resourceId}/chat`,
+            {
+                method: "POST",
+                body: JSON.stringify({ question, history }),
+            }
+        ).then((r) => r.data),
+
     // ─── Admin (requires x-admin-key header) ─────────────────────────────
 
     adminUpload: (formData: FormData, adminKey: string) =>
