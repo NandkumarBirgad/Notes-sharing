@@ -90,8 +90,8 @@ const UploadPage = () => {
       setDescription('');
       setFile(null);
       setFileType('');
-    } catch (err: any) {
-      toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
+    } catch (err) {
+      toast({ title: 'Upload failed', description: err instanceof Error ? err.message : String(err), variant: 'destructive' });
     } finally {
       setUploading(false);
     }

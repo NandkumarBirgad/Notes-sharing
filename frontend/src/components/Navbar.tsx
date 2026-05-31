@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Search, BookOpen, Upload, Shield, Menu, X, Brain, Code, Target } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api.ts';
 
 const Navbar = () => {
+  const location = useLocation();
   const [search, setSearch] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
@@ -17,6 +18,11 @@ const Navbar = () => {
     queryKey: ['years'],
     queryFn: api.getYears,
   });
+
+  // If we are not on the home page, do not render the navbar
+  if (location.pathname !== '/') {
+    return null;
+  }
 
   const skillCategories = years.filter((y) => y.order >= 5);
   const skillIcons: Record<string, typeof Brain> = { DSA: Brain, Programming: Code, Aptitude: Target };

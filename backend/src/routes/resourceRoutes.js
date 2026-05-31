@@ -7,7 +7,6 @@ const {
   updateResource,
   incrementDownload,
   listAllUploads,
-  summarizeResource,
   chatAboutResource,
   getSingleResource,
 } = require('../controllers/resourceController');
@@ -22,7 +21,6 @@ const upload = getUploader();
 router.get('/single/:id',          mongoIdParam('id'),        validate, getSingleResource);
 router.get('/:subjectId',          mongoIdParam('subjectId'), validate, getResources);
 router.patch('/:id/download',      mongoIdParam('id'),        validate, incrementDownload);
-router.post('/:id/summarize',      mongoIdParam('id'),        validate, summarizeResource);
 router.post('/:id/chat',           mongoIdParam('id'),        validate, chatAboutResource);
 
 // Admin

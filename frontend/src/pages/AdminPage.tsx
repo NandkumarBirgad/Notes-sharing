@@ -28,8 +28,8 @@ const AdminPage = () => {
       toast({ title: 'Deleted', description: 'Material removed successfully.' });
       refetch();
     },
-    onError: (err: any) => {
-      toast({ title: 'Delete failed', description: err.message, variant: 'destructive' });
+    onError: (err) => {
+      toast({ title: 'Delete failed', description: err instanceof Error ? err.message : String(err), variant: 'destructive' });
     },
   });
 

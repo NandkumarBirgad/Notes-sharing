@@ -123,13 +123,6 @@ export const api = {
             (r) => r.data
         ),
 
-    // AI Summarize
-    summarize: (resourceId: string) =>
-        request<SuccessResponse<{ aiSummary: string }>>(
-            `/resources/${resourceId}/summarize`,
-            { method: "POST" }
-        ).then((r) => r.data),
-
     // Get Single Resource details directly by ID
     getSingleResource: (resourceId: string) =>
         request<SuccessResponse<Resource>>(`/resources/single/${resourceId}`).then((r) => r.data),
@@ -155,7 +148,7 @@ export const api = {
             if (!res.ok) {
                 const body = await res.json().catch(() => ({}));
                 const errMsg = body.errors && body.errors.length > 0 
-                    ? `Validation failed: ${body.errors.map((e: any) => e.msg).join(', ')}`
+                    ? `Validation failed: ${body.errors.map((e: { msg: string }) => e.msg).join(', ')}`
                     : (body.message || "Upload failed");
                 throw new Error(errMsg);
             }
