@@ -81,18 +81,12 @@ const YearPage = () => {
                   className="group relative block overflow-hidden rounded-xl border bg-card p-8 card-shadow transition-shadow duration-300 hover:card-shadow-hover"
                 >
                   <div className={`absolute inset-0 bg-gradient-to-br ${isSkillCategory && skillCfg ? skillCfg.gradient : 'from-accent/5 to-transparent'} opacity-0 transition-opacity duration-300 group-hover:opacity-100`} />
-                  <div className="relative flex items-start gap-4">
+                  <div className="relative flex items-center gap-4">
                     <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-colors duration-300 ${isSkillCategory && skillCfg ? `${skillCfg.accentBg} ${skillCfg.accentText}` : 'bg-accent/10 text-accent group-hover:bg-accent group-hover:text-accent-foreground'}`}>
                       <IconComponent className="h-6 w-6" />
                     </div>
                     <div>
                       <h2 className="font-display text-2xl font-bold text-card-foreground">{sem.name}</h2>
-                      <p className="mt-1 text-muted-foreground">
-                        {isSkillCategory ? 'Explore sub-topics and study materials' : 'View all subjects and study materials'}
-                      </p>
-                      <div className="mt-3 flex items-center gap-1 text-sm font-medium text-accent">
-                        {isSkillCategory ? 'View Sub-topics' : 'View Subjects'} <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1.5" />
-                      </div>
                     </div>
                   </div>
                 </Link>
