@@ -10,11 +10,21 @@ if (BASE !== "/api" && !BASE.endsWith("/api") && !BASE.endsWith("/api/")) {
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
+export interface Branch {
+    _id: string;
+    name: string;
+    code: string;
+    description: string;
+    icon: string;
+    order: number;
+}
+
 export interface Year {
     _id: string;
     name: string;
     description: string;
     order: number;
+    branchId: string | Branch;
 }
 
 export interface Semester {
@@ -22,6 +32,7 @@ export interface Semester {
     name: string;
     description: string;
     yearId: string | { _id: string; name: string };
+    branchId: string | Branch;
     order: number;
 }
 
@@ -32,6 +43,7 @@ export interface Subject {
     description: string;
     semesterId: string | { _id: string; name: string };
     yearId: string | { _id: string; name: string };
+    branchId: string | Branch;
 }
 
 export interface Resource {
@@ -43,12 +55,18 @@ export interface Resource {
     type: "note" | "paper" | "video";
     fileSize: number;
     fileType: string;
+    branchId: string | Branch;
     yearId: string | { _id: string; name: string };
     semesterId: string | { _id: string; name: string };
     subjectId: string | { _id: string; name: string; code?: string };
     downloads: number;
     createdAt: string;
     updatedAt: string;
+}
+
+export interface BranchStats {
+    resourceCount: number;
+    yearCount: number;
 }
 
 export interface PaginatedResponse<T> {
@@ -88,9 +106,27 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 // ─── Public API ───────────────────────────────────────────────────────────
 
 export const api = {
-    // Years
-    getYears: () =>
-        request<SuccessResponse<Year[]>>("/years").then((r) => r.data),
+    // Branches
+    getBranches: () =>
+        request<SuccessResponse<Branch[]>>("/branches").then((r) => r.data),
+
+    getBranch: (branchId: string) =>
+        request<SuccessResponse<Branch>>(`/branches/${branchId}`).then((r) => r.data),
+
+    getBranchStats: (branchId: string) =>
+        request<SuccessResponse<BranchStats>>(`/branches/${branchId}/stats`).then((r) => r.data),
+
+    getAllBranchStats: () =>
+        request<SuccessResponse<Record<string, number>>>("/branches/stats/all").then((r) => r.data),
+
+    // Years (optionally filtered by branch)
+    getYears: (branchId?: string) => {
+        const qs = branchId ? `?branchId=${branchId}` : "";
+        return request<SuccessResponse<Year[]>>(`/years${qs}`).then((r) => r.data);
+    },
+
+    getYear: (yearId: string) =>
+        request<SuccessResponse<Year>>(`/years/${yearId}`).then((r) => r.data),
 
     // Semesters for a year
     getSemesters: (yearId: string) =>
@@ -117,11 +153,18 @@ export const api = {
             { method: "PATCH" }
         ).then((r) => r.data),
 
-    // Search
-    search: (q: string) =>
-        request<PaginatedResponse<Resource>>(`/search?q=${encodeURIComponent(q)}`).then(
+    // Search (supports branch, year, semester, subject, type filters)
+    search: (q: string, filters?: { branch?: string; year?: string; semester?: string; type?: string }) => {
+        const params = new URLSearchParams();
+        if (q) params.set("q", q);
+        if (filters?.branch) params.set("branch", filters.branch);
+        if (filters?.year) params.set("year", filters.year);
+        if (filters?.semester) params.set("semester", filters.semester);
+        if (filters?.type) params.set("type", filters.type);
+        return request<PaginatedResponse<Resource>>(`/search?${params.toString()}`).then(
             (r) => r.data
-        ),
+        );
+    },
 
     // Get Single Resource details directly by ID
     getSingleResource: (resourceId: string) =>
@@ -147,7 +190,7 @@ export const api = {
         }).then(async (res) => {
             if (!res.ok) {
                 const body = await res.json().catch(() => ({}));
-                const errMsg = body.errors && body.errors.length > 0 
+                const errMsg = body.errors && body.errors.length > 0
                     ? `Validation failed: ${body.errors.map((e: { msg: string }) => e.msg).join(', ')}`
                     : (body.message || "Upload failed");
                 throw new Error(errMsg);
@@ -155,14 +198,48 @@ export const api = {
             return res.json() as Promise<SuccessResponse<Resource>>;
         }),
 
-    adminListAll: (adminKey: string) =>
-        request<PaginatedResponse<Resource>>("/resources", {
+    adminListAll: (adminKey: string, filters?: { branchId?: string; yearId?: string; semesterId?: string }) => {
+        const params = new URLSearchParams();
+        if (filters?.branchId) params.set("branchId", filters.branchId);
+        if (filters?.yearId) params.set("yearId", filters.yearId);
+        if (filters?.semesterId) params.set("semesterId", filters.semesterId);
+        const qs = params.toString();
+        return request<PaginatedResponse<Resource>>(`/resources${qs ? `?${qs}` : ""}`, {
             headers: { "x-admin-key": adminKey } as Record<string, string>,
-        }).then((r) => r.data),
+        }).then((r) => r.data);
+    },
 
     adminDelete: (resourceId: string, adminKey: string) =>
         request<SuccessResponse<null>>(`/resources/${resourceId}`, {
             method: "DELETE",
             headers: { "x-admin-key": adminKey } as Record<string, string>,
         }),
+
+    // Branch admin CRUD
+    adminCreateBranch: (data: { name: string; code: string; description?: string; icon?: string; order?: number }, adminKey: string) =>
+        request<SuccessResponse<Branch>>("/branches", {
+            method: "POST",
+            headers: { "x-admin-key": adminKey } as Record<string, string>,
+            body: JSON.stringify(data),
+        }).then((r) => r.data),
+
+    adminUpdateBranch: (branchId: string, data: Partial<Branch>, adminKey: string) =>
+        request<SuccessResponse<Branch>>(`/branches/${branchId}`, {
+            method: "PATCH",
+            headers: { "x-admin-key": adminKey } as Record<string, string>,
+            body: JSON.stringify(data),
+        }).then((r) => r.data),
+
+    adminDeleteBranch: (branchId: string, adminKey: string) =>
+        request<SuccessResponse<null>>(`/branches/${branchId}`, {
+            method: "DELETE",
+            headers: { "x-admin-key": adminKey } as Record<string, string>,
+        }),
+
+    adminCreateYear: (data: { name: string; description?: string; order?: number; branchId: string }, adminKey: string) =>
+        request<SuccessResponse<Year>>("/years", {
+            method: "POST",
+            headers: { "x-admin-key": adminKey } as Record<string, string>,
+            body: JSON.stringify(data),
+        }).then((r) => r.data),
 };

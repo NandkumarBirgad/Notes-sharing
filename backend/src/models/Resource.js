@@ -41,6 +41,11 @@ const resourceSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    branchId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Branch',
+      required: [true, 'Branch reference is required'],
+    },
     yearId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Year',
@@ -68,6 +73,7 @@ const resourceSchema = new mongoose.Schema(
 resourceSchema.index({ subjectId: 1 });
 resourceSchema.index({ semesterId: 1 });
 resourceSchema.index({ yearId: 1 });
+resourceSchema.index({ branchId: 1 });
 resourceSchema.index({ type: 1 });
 resourceSchema.index({ title: 'text', description: 'text' }); // full-text search
 

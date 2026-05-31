@@ -6,7 +6,6 @@ const yearSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Year name is required'],
       trim: true,
-      unique: true,
     },
     description: {
       type: String,
@@ -17,8 +16,16 @@ const yearSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    branchId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Branch',
+      required: [true, 'Branch reference is required'],
+    },
   },
   { timestamps: true }
 );
+
+yearSchema.index({ branchId: 1 });
+yearSchema.index({ branchId: 1, order: 1 });
 
 module.exports = mongoose.model('Year', yearSchema);

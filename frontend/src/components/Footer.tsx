@@ -71,17 +71,7 @@ const Footer = () => {
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4" />
-                support@studyvault.com
-              </li>
-
-              <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4" />
-                +91 9876543210
-              </li>
-
-              <li className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                Maharashtra, India
+                nandkumarbirgad3@gmail.com
               </li>
             </ul>
           </div>
@@ -92,7 +82,7 @@ const Footer = () => {
 
             <div className="flex gap-4">
               <a
-                href="https://github.com"
+                href="https://github.com/NandkumarBirgad"
                 target="_blank"
                 rel="noreferrer"
                 className="p-2 rounded-lg border hover:bg-muted transition"
@@ -101,7 +91,7 @@ const Footer = () => {
               </a>
 
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/in/nandkumar-birgad-3ba58a361/"
                 target="_blank"
                 rel="noreferrer"
                 className="p-2 rounded-lg border hover:bg-muted transition"

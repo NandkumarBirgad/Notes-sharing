@@ -21,6 +21,7 @@ const getResources = asyncHandler(async (req, res) => {
 
   const [resources, total] = await Promise.all([
     Resource.find(filter)
+      .populate('branchId', 'name code icon')
       .populate('yearId', 'name')
       .populate('semesterId', 'name')
       .populate('subjectId', 'name code')
@@ -42,13 +43,15 @@ const uploadResource = asyncHandler(async (req, res) => {
   const subject = await Subject.findById(subjectId);
   if (!subject) return sendError(res, 'Subject not found', 404);
 
+  // Auto-derive branchId from subject
+  const branchId = subject.branchId;
+
   // Build file URL depending on storage mode
   const isCloudinary = (process.env.STORAGE_MODE || 'local') === 'cloudinary';
 
   const fileUrl   = isCloudinary ? req.file.path : getLocalFileUrl(req, req.file.filename);
   const publicId  = isCloudinary ? req.file.filename : '';
 
-  // Generate preview URL (same as fileUrl for now; swap with thumbnail logic if needed)
   const previewUrl = fileUrl;
 
   const resource = await Resource.create({
@@ -60,6 +63,7 @@ const uploadResource = asyncHandler(async (req, res) => {
     type,
     fileSize: req.file.size,
     fileType: path.extname(req.file.originalname).replace('.', '').toLowerCase(),
+    branchId,
     subjectId,
     semesterId,
     yearId,
@@ -117,12 +121,14 @@ const listAllUploads = asyncHandler(async (req, res) => {
 
   const filter = {};
   if (req.query.type)       filter.type       = req.query.type;
+  if (req.query.branchId)   filter.branchId   = req.query.branchId;
   if (req.query.yearId)     filter.yearId     = req.query.yearId;
   if (req.query.semesterId) filter.semesterId = req.query.semesterId;
   if (req.query.subjectId)  filter.subjectId  = req.query.subjectId;
 
   const [resources, total] = await Promise.all([
     Resource.find(filter)
+      .populate('branchId', 'name code icon')
       .populate('yearId', 'name')
       .populate('semesterId', 'name')
       .populate('subjectId', 'name code')
@@ -149,25 +155,23 @@ const chatAboutResource = asyncHandler(async (req, res) => {
     return sendError(res, 'AI Chat is only supported for text documents, not videos.', 400);
   }
 
-  // Extract PDF text
   const text = await extractTextFromPdf(resource.fileUrl);
   if (!text) {
     return sendError(res, 'Could not extract text from this document.', 400);
   }
 
-  // Chat with the document content using Gemini AI
   const answer = await chatWithPdf(text, question, history);
-
   sendSuccess(res, { answer }, 'Answer generated successfully');
 });
 
 // ─── GET /resources/single/:id  [public] ─────────────────────────────────
 const getSingleResource = asyncHandler(async (req, res) => {
   const resource = await Resource.findById(req.params.id)
+    .populate('branchId', 'name code icon')
     .populate('yearId', 'name')
     .populate('semesterId', 'name')
     .populate('subjectId', 'name code');
-  
+
   if (!resource) return sendError(res, 'Resource not found', 404);
   sendSuccess(res, resource, 'Resource fetched successfully');
 });

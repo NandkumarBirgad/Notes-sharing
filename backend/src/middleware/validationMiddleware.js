@@ -10,11 +10,36 @@ const validate = (req, res, next) => {
   next();
 };
 
+// ─── Branch validations ────────────────────────────────────────────────────
+const branchRules = [
+  body('name').trim().notEmpty().withMessage('Branch name is required'),
+  body('code').trim().notEmpty().withMessage('Branch code is required'),
+  body('description').optional().trim(),
+  body('icon').optional().trim(),
+  body('order').optional().isInt({ min: 0 }).withMessage('Order must be a non-negative integer'),
+];
+
+const branchUpdateRules = [
+  body('name').optional().trim().notEmpty().withMessage('Branch name cannot be empty'),
+  body('code').optional().trim().notEmpty().withMessage('Branch code cannot be empty'),
+  body('description').optional().trim(),
+  body('icon').optional().trim(),
+  body('order').optional().isInt({ min: 0 }),
+];
+
 // ─── Year validations ──────────────────────────────────────────────────────
 const yearRules = [
   body('name').trim().notEmpty().withMessage('Year name is required'),
+  body('branchId').isMongoId().withMessage('Valid branchId is required'),
   body('description').optional().trim(),
   body('order').optional().isInt({ min: 0 }).withMessage('Order must be a non-negative integer'),
+];
+
+const yearUpdateRules = [
+  body('name').optional().trim().notEmpty().withMessage('Year name cannot be empty'),
+  body('branchId').optional().isMongoId().withMessage('Valid branchId is required'),
+  body('description').optional().trim(),
+  body('order').optional().isInt({ min: 0 }),
 ];
 
 // ─── Semester validations ──────────────────────────────────────────────────
@@ -64,6 +89,7 @@ const mongoIdParam = (paramName) => [
 // ─── Search query validation ───────────────────────────────────────────────
 const searchRules = [
   query('q').optional().trim(),
+  query('branch').optional().isMongoId().withMessage('branch must be a valid ID'),
   query('year').optional().isMongoId().withMessage('year must be a valid ID'),
   query('semester').optional().isMongoId().withMessage('semester must be a valid ID'),
   query('subject').optional().isMongoId().withMessage('subject must be a valid ID'),
@@ -75,7 +101,10 @@ const searchRules = [
 
 module.exports = {
   validate,
+  branchRules,
+  branchUpdateRules,
   yearRules,
+  yearUpdateRules,
   semesterRules,
   subjectRules,
   resourceUploadRules,

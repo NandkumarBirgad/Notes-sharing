@@ -3,9 +3,9 @@ const asyncHandler   = require('../utils/asyncHandler');
 const { sendPaginated } = require('../utils/responseHandler');
 const { getPagination, getSort } = require('../utils/pagination');
 
-// GET /search?q=&year=&semester=&subject=&type=
+// GET /search?q=&branch=&year=&semester=&subject=&type=
 const search = asyncHandler(async (req, res) => {
-  const { q, year, semester, subject, type } = req.query;
+  const { q, branch, year, semester, subject, type } = req.query;
   const { page, limit, skip } = getPagination(req.query);
   const sort = getSort(req.query, ['title', 'createdAt', 'downloads']);
 
@@ -17,6 +17,7 @@ const search = asyncHandler(async (req, res) => {
   }
 
   // Filters
+  if (branch)   filter.branchId   = branch;
   if (year)     filter.yearId     = year;
   if (semester) filter.semesterId = semester;
   if (subject)  filter.subjectId  = subject;
@@ -24,6 +25,7 @@ const search = asyncHandler(async (req, res) => {
 
   const [resources, total] = await Promise.all([
     Resource.find(filter)
+      .populate('branchId', 'name code icon')
       .populate('yearId', 'name')
       .populate('semesterId', 'name')
       .populate('subjectId', 'name code')

@@ -27,11 +27,17 @@ const subjectSchema = new mongoose.Schema(
       ref: 'Year',
       required: [true, 'Year reference is required'],
     },
+    branchId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Branch',
+      required: [true, 'Branch reference is required'],
+    },
   },
   { timestamps: true }
 );
 
 subjectSchema.index({ semesterId: 1 });
 subjectSchema.index({ yearId: 1 });
+subjectSchema.index({ branchId: 1 });
 
 module.exports = mongoose.model('Subject', subjectSchema);

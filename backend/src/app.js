@@ -4,11 +4,12 @@ const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
 
-const yearRoutes = require('./routes/yearRoutes');
-const semesterRoutes = require('./routes/semesterRoutes');
-const subjectRoutes = require('./routes/subjectRoutes');
-const resourceRoutes = require('./routes/resourceRoutes');
-const searchRoutes = require('./routes/searchRoutes');
+const branchRoutes    = require('./routes/branchRoutes');
+const yearRoutes      = require('./routes/yearRoutes');
+const semesterRoutes  = require('./routes/semesterRoutes');
+const subjectRoutes   = require('./routes/subjectRoutes');
+const resourceRoutes  = require('./routes/resourceRoutes');
+const searchRoutes    = require('./routes/searchRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
 const app = express();
@@ -52,7 +53,7 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.get('/health', (req, res) => {
   res.json({
     success: true,
-    message: 'Study Portal API is running',
+    message: 'StudyVault API is running',
     timestamp: new Date().toISOString(),
     env: process.env.NODE_ENV,
   });
@@ -73,11 +74,12 @@ app.get('/debug-pdf', (req, res) => {
 
 
 // ─── API Routes ────────────────────────────────────────────────────────────
-app.use('/api/years', yearRoutes);
+app.use('/api/branches',  branchRoutes);
+app.use('/api/years',     yearRoutes);
 app.use('/api/semesters', semesterRoutes);
-app.use('/api/subjects', subjectRoutes);
+app.use('/api/subjects',  subjectRoutes);
 app.use('/api/resources', resourceRoutes);
-app.use('/api/search', searchRoutes);
+app.use('/api/search',    searchRoutes);
 
 // ─── 404 & Error Handlers ──────────────────────────────────────────────────
 app.use(notFound);

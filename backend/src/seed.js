@@ -1,263 +1,291 @@
 /**
- * Seed script – populates MongoDB with the same data the frontend mockData had.
+ * Seed script – populates MongoDB with branch-aware academic data.
  *
  * Usage:
  *   node src/seed.js          (or: npm run seed)
  *
  * It will:
  *  1. Connect to MONGO_URI from .env
- *  2. Drop existing years / semesters / subjects / resources
- *  3. Re-create them with the data below
+ *  2. Drop existing branches / years / semesters / subjects / resources
+ *  3. Re-create them with branch-aware data
  */
 
 require('dotenv').config();
 const mongoose = require('mongoose');
 const connectDB = require('./config/db');
 
-const Year = require('./models/Year');
+const Branch   = require('./models/Branch');
+const Year     = require('./models/Year');
 const Semester = require('./models/Semester');
-const Subject = require('./models/Subject');
+const Subject  = require('./models/Subject');
 const Resource = require('./models/Resource');
 
-// ─── Seed Data ─────────────────────────────────────────────────────────────
+// ─── Branch Data ─────────────────────────────────────────────────────────────
+const branchesData = [
+  { name: 'Computer Engineering', code: 'CE',    icon: '💻', description: 'Programming, DSA, DBMS, OS & Core CS subjects', order: 1 },
+  { name: 'Information Technology', code: 'IT',  icon: '🌐', description: 'Software engineering, web technologies & networking', order: 2 },
+  { name: 'Artificial Intelligence & Data Science', code: 'AIDS', icon: '🤖', description: 'Machine learning, AI, data science & analytics', order: 3 },
+  { name: 'Electronics & Telecommunication', code: 'ENTC', icon: '📡', description: 'Electronics, signals, communication & VLSI', order: 4 },
+  { name: 'Mechanical Engineering', code: 'MECH', icon: '⚙️', description: 'Mechanics, thermodynamics, manufacturing & design', order: 5 },
+  { name: 'Civil Engineering', code: 'CIVIL',    icon: '🏗️', description: 'Structures, surveying, materials & construction', order: 6 },
+];
 
+// ─── Year Data (per branch) ────────────────────────────────────────────────
 const yearsData = [
-    { name: '1st Year', description: 'Foundation courses & basics', order: 1 },
-    { name: '2nd Year', description: 'Core subject fundamentals', order: 2 },
-    { name: '3rd Year', description: 'Advanced & elective courses', order: 3 },
-    { name: '4th Year', description: 'Specialization & projects', order: 4 },
-    { name: 'DSA', description: 'Data Structures & Algorithms – master problem solving', order: 5 },
-    { name: 'Programming', description: 'Programming languages & concepts – build your coding skills', order: 6 },
-    { name: 'Aptitude', description: 'Quantitative, Logical & Verbal – crack any aptitude test', order: 7 },
+  { name: '1st Year', description: 'Foundation courses & basics', order: 1 },
+  { name: '2nd Year', description: 'Core subject fundamentals', order: 2 },
+  { name: '3rd Year', description: 'Advanced & elective courses', order: 3 },
+  { name: '4th Year', description: 'Specialization & projects', order: 4 },
 ];
 
-// Semesters for academic years (order 1-4)
+// ─── Semesters (same for each year) ───────────────────────────────────────
 const semestersData = [
-    { name: 'Semester 1', order: 1 },
-    { name: 'Semester 2', order: 2 },
+  { name: 'Semester 1', order: 1 },
+  { name: 'Semester 2', order: 2 },
 ];
 
-// Topics for DSA (year order 5)
-const dsaTopicsData = [
-    { name: 'Arrays & Strings', order: 1 },
-    { name: 'Linked Lists & Stacks', order: 2 },
-    { name: 'Trees & Graphs', order: 3 },
-    { name: 'Sorting & Searching', order: 4 },
-    { name: 'Dynamic Programming', order: 5 },
-    { name: 'Greedy & Backtracking', order: 6 },
-];
-
-// Topics for Programming (year order 6)
-const programmingTopicsData = [
-    { name: 'C Programming', order: 1 },
-    { name: 'C++ & STL', order: 2 },
-    { name: 'Java', order: 3 },
-    { name: 'Python', order: 4 },
-    { name: 'JavaScript & Web Dev', order: 5 },
-    { name: 'SQL & Databases', order: 6 },
-];
-
-// Topics for Aptitude (year order 7)
-const aptitudeTopicsData = [
-    { name: 'Quantitative Aptitude', order: 1 },
-    { name: 'Logical Reasoning', order: 2 },
-    { name: 'Verbal Ability', order: 3 },
-    { name: 'Data Interpretation', order: 4 },
-];
-
+// ─── Subjects per Branch + Year + Semester ─────────────────────────────────
+// Key: "branchCode-yearOrder-semOrder"
 const subjectsMap = {
-    // Academic years
-    '1-1': ['Mathematics I', 'Physics', 'Chemistry', 'English', 'Programming in C'],
-    '1-2': ['Mathematics II', 'Engineering Drawing', 'Data Structures', 'Digital Electronics', 'Environmental Science'],
-    '2-1': ['Discrete Mathematics', 'Object-Oriented Programming', 'Computer Organization', 'Database Management', 'Operating Systems'],
-    '2-2': ['Software Engineering', 'Computer Networks', 'Theory of Computation', 'Web Technologies', 'Statistics'],
-    '3-1': ['Compiler Design', 'Machine Learning', 'Information Security', 'Cloud Computing', 'Mobile App Development'],
-    '3-2': ['Artificial Intelligence', 'Big Data Analytics', 'IoT', 'Blockchain', 'Natural Language Processing'],
-    '4-1': ['Deep Learning', 'Distributed Systems', 'Cyber Security', 'Project Work I', 'Elective I'],
-    '4-2': ['Project Work II', 'Elective II', 'Elective III', 'Seminar', 'Internship'],
+  // Computer Engineering
+  'CE-1-1': ['Mathematics I', 'Physics', 'Chemistry', 'English', 'Programming in C'],
+  'CE-1-2': ['Mathematics II', 'Engineering Drawing', 'Data Structures', 'Digital Electronics', 'Environmental Science'],
+  'CE-2-1': ['Discrete Mathematics', 'Object-Oriented Programming', 'Computer Organization', 'Database Management', 'Operating Systems'],
+  'CE-2-2': ['Software Engineering', 'Computer Networks', 'Theory of Computation', 'Web Technologies', 'Statistics'],
+  'CE-3-1': ['Compiler Design', 'Machine Learning', 'Information Security', 'Cloud Computing', 'Mobile App Development'],
+  'CE-3-2': ['Artificial Intelligence', 'Big Data Analytics', 'IoT', 'Blockchain', 'Natural Language Processing'],
+  'CE-4-1': ['Deep Learning', 'Distributed Systems', 'Cyber Security', 'Project Work I', 'Elective I'],
+  'CE-4-2': ['Project Work II', 'Elective II', 'Elective III', 'Seminar', 'Internship'],
 
-    // DSA topics → subjects (sub-topics)
-    '5-1': ['Two Pointer Technique', 'Sliding Window', 'Prefix Sum', 'String Matching', 'Matrix Problems'],
-    '5-2': ['Singly Linked List', 'Doubly Linked List', 'Stack Applications', 'Queue & Deque', 'Monotonic Stack'],
-    '5-3': ['Binary Trees', 'BST', 'Graph Traversals (BFS/DFS)', 'Shortest Path Algorithms', 'Minimum Spanning Tree'],
-    '5-4': ['Merge Sort', 'Quick Sort', 'Binary Search', 'Heap & Priority Queue', 'Counting Sort & Radix Sort'],
-    '5-5': ['1D DP Problems', '2D DP Problems', 'Knapsack Variations', 'LCS & LIS', 'DP on Trees'],
-    '5-6': ['Activity Selection', 'Huffman Coding', 'N-Queens', 'Sudoku Solver', 'Rat in a Maze'],
+  // Information Technology
+  'IT-1-1': ['Mathematics I', 'Physics', 'Problem Solving & Python', 'English Communication', 'Workshop Practice'],
+  'IT-1-2': ['Mathematics II', 'Web Fundamentals', 'Data Structures', 'Digital Logic', 'Environmental Studies'],
+  'IT-2-1': ['Discrete Mathematics', 'Java Programming', 'DBMS', 'Operating Systems', 'Computer Networks I'],
+  'IT-2-2': ['Software Engineering', 'Computer Networks II', 'Web Development', 'Statistics & Probability', 'Linux Admin'],
+  'IT-3-1': ['Cloud Computing', 'Information Security', 'Mobile Development', 'ERP Systems', 'Data Warehousing'],
+  'IT-3-2': ['Big Data Analytics', 'IoT Applications', 'DevOps', 'Project Management', 'Machine Learning'],
+  'IT-4-1': ['AI Applications', 'Cyber Security', 'Blockchain Technology', 'Project Work I', 'Elective I'],
+  'IT-4-2': ['Project Work II', 'Elective II', 'Seminar', 'Internship', 'Industry Connect'],
 
-    // Programming topics → subjects
-    '6-1': ['C Basics & Syntax', 'Pointers & Memory', 'File Handling in C', 'Structures & Unions', 'C Practice Problems'],
-    '6-2': ['C++ OOP Concepts', 'STL Containers', 'STL Algorithms', 'Templates & Generics', 'Competitive Programming in C++'],
-    '6-3': ['Java Basics', 'Collections Framework', 'Multithreading', 'Exception Handling', 'Java Projects'],
-    '6-4': ['Python Basics', 'Python OOP', 'Python Libraries (NumPy, Pandas)', 'File Handling & Automation', 'Python Practice Problems'],
-    '6-5': ['HTML & CSS', 'JavaScript Fundamentals', 'React.js', 'Node.js & Express', 'Full-Stack Projects'],
-    '6-6': ['SQL Basics', 'Joins & Subqueries', 'Normalization', 'MongoDB Basics', 'Database Design'],
+  // AIDS
+  'AIDS-1-1': ['Mathematics I', 'Statistics & Probability', 'Python Programming', 'Data Fundamentals', 'English'],
+  'AIDS-1-2': ['Mathematics II', 'Linear Algebra', 'Data Structures', 'Data Visualization', 'Environmental Science'],
+  'AIDS-2-1': ['Machine Learning I', 'DBMS', 'Python for Data Science', 'Operating Systems', 'Probability Theory'],
+  'AIDS-2-2': ['Machine Learning II', 'Deep Learning Basics', 'Big Data Technologies', 'NLP Fundamentals', 'Computer Vision I'],
+  'AIDS-3-1': ['Deep Learning Advanced', 'Reinforcement Learning', 'Data Engineering', 'MLOps', 'AI Ethics'],
+  'AIDS-3-2': ['Generative AI', 'Computer Vision II', 'Speech & Audio Processing', 'Knowledge Graphs', 'AI in Healthcare'],
+  'AIDS-4-1': ['Research Methodology', 'Advanced ML Systems', 'AI Product Development', 'Project Work I', 'Elective I'],
+  'AIDS-4-2': ['Project Work II', 'Elective II', 'Industry Internship', 'Seminar', 'Capstone Project'],
 
-    // Aptitude topics → subjects
-    '7-1': ['Number System', 'Percentage & Profit/Loss', 'Time, Speed & Distance', 'Ratio & Proportion', 'Permutations & Combinations'],
-    '7-2': ['Coding-Decoding', 'Blood Relations', 'Seating Arrangement', 'Syllogism', 'Puzzles'],
-    '7-3': ['Reading Comprehension', 'Para Jumbles', 'Sentence Correction', 'Vocabulary', 'Verbal Analogies'],
-    '7-4': ['Bar Graphs', 'Pie Charts', 'Line Graphs', 'Tables & Caselets', 'Mixed DI'],
+  // ENTC
+  'ENTC-1-1': ['Engineering Mathematics I', 'Engineering Physics', 'Basic Electronics', 'Workshop', 'English'],
+  'ENTC-1-2': ['Engineering Mathematics II', 'Electronic Devices', 'Network Analysis', 'Digital Electronics', 'Environmental Sci'],
+  'ENTC-2-1': ['Signals & Systems', 'Analog Circuits', 'Microprocessors', 'Electromagnetic Theory', 'Control Systems I'],
+  'ENTC-2-2': ['Control Systems II', 'Communication Systems', 'DSP', 'VLSI Design', 'PCB Design'],
+  'ENTC-3-1': ['Wireless Communication', 'Antenna Theory', 'Embedded Systems', 'Optical Fiber Communication', 'IoT'],
+  'ENTC-3-2': ['5G & Beyond', 'RF Circuit Design', 'Image Processing', 'Satellite Communication', 'Radar Systems'],
+  'ENTC-4-1': ['Advanced Communication', 'MEMS', 'Power Electronics', 'Project Work I', 'Elective I'],
+  'ENTC-4-2': ['Project Work II', 'Elective II', 'Seminar', 'Internship', 'Industry Project'],
+
+  // Mechanical
+  'MECH-1-1': ['Engineering Mathematics I', 'Engineering Physics', 'Engineering Chemistry', 'Workshop Technology', 'English'],
+  'MECH-1-2': ['Engineering Mathematics II', 'Engineering Drawing', 'Thermodynamics I', 'Mechanics of Solids', 'Env Science'],
+  'MECH-2-1': ['Fluid Mechanics', 'Manufacturing Processes I', 'Machine Drawing', 'Thermodynamics II', 'Material Science'],
+  'MECH-2-2': ['Heat Transfer', 'Theory of Machines I', 'Manufacturing Processes II', 'Metrology', 'Strength of Materials'],
+  'MECH-3-1': ['Machine Design I', 'CAD/CAM', 'Theory of Machines II', 'IC Engines', 'Industrial Engineering'],
+  'MECH-3-2': ['Machine Design II', 'Refrigeration & AC', 'Turbomachinery', 'Robotics', 'FEA'],
+  'MECH-4-1': ['Automobile Engineering', 'Advanced Manufacturing', 'Mechatronics', 'Project Work I', 'Elective I'],
+  'MECH-4-2': ['Project Work II', 'Elective II', 'Seminar', 'Internship', 'Quality Engineering'],
+
+  // Civil
+  'CIVIL-1-1': ['Engineering Mathematics I', 'Engineering Physics', 'Engineering Chemistry', 'Engineering Drawing', 'English'],
+  'CIVIL-1-2': ['Engineering Mathematics II', 'Building Materials', 'Surveying I', 'Fluid Mechanics I', 'Env Science'],
+  'CIVIL-2-1': ['Structural Analysis I', 'Soil Mechanics', 'Surveying II', 'Fluid Mechanics II', 'Construction Technology'],
+  'CIVIL-2-2': ['Structural Analysis II', 'Foundation Engineering', 'Water Supply Engineering', 'Highway Engineering', 'Irrigation'],
+  'CIVIL-3-1': ['RCC Design', 'Steel Structures', 'Geotechnical Engineering', 'Environmental Engineering', 'Traffic Engineering'],
+  'CIVIL-3-2': ['Pre-stressed Concrete', 'Bridge Engineering', 'Construction Management', 'GIS & Remote Sensing', 'Earthquake Engineering'],
+  'CIVIL-4-1': ['Advanced Concrete Design', 'Smart Cities', 'Sustainable Construction', 'Project Work I', 'Elective I'],
+  'CIVIL-4-2': ['Project Work II', 'Elective II', 'Seminar', 'Internship', 'Urban Planning'],
 };
 
-// Sample resources (keyed by "yearOrder-semOrder-subjectName")
+// ─── Sample Resources ──────────────────────────────────────────────────────
 const sampleResources = [
-    { yearOrder: 1, semOrder: 1, subject: 'Mathematics I', title: 'Linear Algebra Notes', description: 'Complete notes on vectors, matrices, and eigenvalues', type: 'note', fileType: 'pdf', downloads: 234 },
-    { yearOrder: 1, semOrder: 1, subject: 'Physics', title: 'Physics Mid-term 2024', description: 'Mid-semester examination paper with solutions', type: 'paper', fileType: 'pdf', downloads: 189 },
-    { yearOrder: 1, semOrder: 1, subject: 'Programming in C', title: 'C Programming Basics', description: 'Introduction to C programming fundamentals', type: 'video', fileType: 'mp4', downloads: 412 },
-    { yearOrder: 1, semOrder: 2, subject: 'Data Structures', title: 'Data Structures Handbook', description: 'Arrays, linked lists, trees, and graphs', type: 'note', fileType: 'pdf', downloads: 567 },
-    { yearOrder: 2, semOrder: 1, subject: 'Database Management', title: 'DBMS Complete Notes', description: 'Relational algebra, SQL, normalization', type: 'note', fileType: 'doc', downloads: 321 },
-    { yearOrder: 2, semOrder: 1, subject: 'Operating Systems', title: 'OS Final Exam 2024', description: 'End-semester examination paper', type: 'paper', fileType: 'pdf', downloads: 276 },
-    { yearOrder: 2, semOrder: 1, subject: 'Object-Oriented Programming', title: 'OOP with Java Tutorial', description: 'Complete Java OOP concepts', type: 'video', fileType: 'mp4', downloads: 498 },
-    { yearOrder: 2, semOrder: 2, subject: 'Computer Networks', title: 'CN Lecture Slides', description: 'OSI model, TCP/IP, routing protocols', type: 'note', fileType: 'ppt', downloads: 345 },
-    { yearOrder: 3, semOrder: 1, subject: 'Machine Learning', title: 'ML Algorithms Guide', description: 'Regression, classification, clustering', type: 'note', fileType: 'pdf', downloads: 612 },
-    { yearOrder: 3, semOrder: 2, subject: 'Artificial Intelligence', title: 'AI Mid-term 2024', description: 'Search algorithms, knowledge representation', type: 'paper', fileType: 'pdf', downloads: 198 },
-    { yearOrder: 4, semOrder: 1, subject: 'Deep Learning', title: 'Deep Learning Intro', description: 'Neural networks, CNNs, RNNs', type: 'video', fileType: 'mp4', downloads: 387 },
-    { yearOrder: 3, semOrder: 2, subject: 'Blockchain', title: 'Blockchain Fundamentals', description: 'Distributed ledger, consensus mechanisms', type: 'note', fileType: 'pdf', downloads: 156 },
+  // Computer Engineering
+  { branch: 'CE', yearOrder: 1, semOrder: 1, subject: 'Mathematics I', title: 'Linear Algebra Notes', description: 'Complete notes on vectors, matrices, and eigenvalues', type: 'note', fileType: 'pdf', downloads: 234 },
+  { branch: 'CE', yearOrder: 1, semOrder: 1, subject: 'Physics', title: 'Physics Mid-term 2024', description: 'Mid-semester examination paper with solutions', type: 'paper', fileType: 'pdf', downloads: 189 },
+  { branch: 'CE', yearOrder: 1, semOrder: 1, subject: 'Programming in C', title: 'C Programming Basics', description: 'Introduction to C programming fundamentals', type: 'video', fileType: 'mp4', downloads: 412 },
+  { branch: 'CE', yearOrder: 1, semOrder: 2, subject: 'Data Structures', title: 'Data Structures Handbook', description: 'Arrays, linked lists, trees, and graphs', type: 'note', fileType: 'pdf', downloads: 567 },
+  { branch: 'CE', yearOrder: 2, semOrder: 1, subject: 'Database Management', title: 'DBMS Complete Notes', description: 'Relational algebra, SQL, normalization', type: 'note', fileType: 'pdf', downloads: 321 },
+  { branch: 'CE', yearOrder: 2, semOrder: 1, subject: 'Operating Systems', title: 'OS Final Exam 2024', description: 'End-semester examination paper', type: 'paper', fileType: 'pdf', downloads: 276 },
+  { branch: 'CE', yearOrder: 2, semOrder: 1, subject: 'Object-Oriented Programming', title: 'OOP with Java Tutorial', description: 'Complete Java OOP concepts', type: 'video', fileType: 'mp4', downloads: 498 },
+  { branch: 'CE', yearOrder: 3, semOrder: 1, subject: 'Machine Learning', title: 'ML Algorithms Guide', description: 'Regression, classification, clustering', type: 'note', fileType: 'pdf', downloads: 612 },
+  { branch: 'CE', yearOrder: 3, semOrder: 2, subject: 'Artificial Intelligence', title: 'AI Mid-term 2024', description: 'Search algorithms, knowledge representation', type: 'paper', fileType: 'pdf', downloads: 198 },
+  { branch: 'CE', yearOrder: 4, semOrder: 1, subject: 'Deep Learning', title: 'Deep Learning Intro', description: 'Neural networks, CNNs, RNNs', type: 'video', fileType: 'mp4', downloads: 387 },
 
-    // DSA sample resources
-    { yearOrder: 5, semOrder: 1, subject: 'Two Pointer Technique', title: 'Two Pointer Patterns', description: 'All two-pointer patterns with examples', type: 'note', fileType: 'pdf', downloads: 723 },
-    { yearOrder: 5, semOrder: 1, subject: 'Sliding Window', title: 'Sliding Window Masterclass', description: 'Fixed and variable window problems', type: 'video', fileType: 'mp4', downloads: 891 },
-    { yearOrder: 5, semOrder: 3, subject: 'Graph Traversals (BFS/DFS)', title: 'Graph BFS/DFS Notes', description: 'Complete guide to graph traversals', type: 'note', fileType: 'pdf', downloads: 654 },
-    { yearOrder: 5, semOrder: 5, subject: '1D DP Problems', title: 'DP Problem Set', description: 'Top 50 1D DP problems with solutions', type: 'paper', fileType: 'pdf', downloads: 1023 },
+  // Information Technology
+  { branch: 'IT', yearOrder: 1, semOrder: 1, subject: 'Problem Solving & Python', title: 'Python Crash Course', description: 'Complete Python from scratch', type: 'note', fileType: 'pdf', downloads: 445 },
+  { branch: 'IT', yearOrder: 2, semOrder: 1, subject: 'DBMS', title: 'DBMS Notes & Query Bank', description: 'SQL queries & normalization guide', type: 'note', fileType: 'pdf', downloads: 389 },
+  { branch: 'IT', yearOrder: 3, semOrder: 1, subject: 'Cloud Computing', title: 'AWS & Cloud Fundamentals', description: 'Intro to cloud services & deployment', type: 'video', fileType: 'mp4', downloads: 523 },
 
-    // Programming sample resources
-    { yearOrder: 6, semOrder: 1, subject: 'C Basics & Syntax', title: 'C Language Complete Guide', description: 'From basics to advanced C programming', type: 'note', fileType: 'pdf', downloads: 534 },
-    { yearOrder: 6, semOrder: 3, subject: 'Java Basics', title: 'Java Programming Tutorial', description: 'Object-oriented programming in Java', type: 'video', fileType: 'mp4', downloads: 678 },
-    { yearOrder: 6, semOrder: 4, subject: 'Python Basics', title: 'Python Crash Course Notes', description: 'Learn Python in one week', type: 'note', fileType: 'pdf', downloads: 912 },
-    { yearOrder: 6, semOrder: 5, subject: 'React.js', title: 'React.js Complete Guide', description: 'Modern React with hooks, context, and routing', type: 'note', fileType: 'pdf', downloads: 445 },
+  // AIDS
+  { branch: 'AIDS', yearOrder: 1, semOrder: 1, subject: 'Python Programming', title: 'Python for Data Science', description: 'NumPy, Pandas, Matplotlib', type: 'note', fileType: 'pdf', downloads: 678 },
+  { branch: 'AIDS', yearOrder: 2, semOrder: 1, subject: 'Machine Learning I', title: 'ML from Scratch', description: 'Linear regression to decision trees', type: 'note', fileType: 'pdf', downloads: 891 },
+  { branch: 'AIDS', yearOrder: 3, semOrder: 1, subject: 'Deep Learning Advanced', title: 'Transformers & Attention', description: 'BERT, GPT and attention mechanisms', type: 'video', fileType: 'mp4', downloads: 1023 },
 
-    // Aptitude sample resources
-    { yearOrder: 7, semOrder: 1, subject: 'Number System', title: 'Number System Shortcuts', description: 'Quick tricks for number system problems', type: 'note', fileType: 'pdf', downloads: 867 },
-    { yearOrder: 7, semOrder: 1, subject: 'Percentage & Profit/Loss', title: 'Percentage Formulas Sheet', description: 'All formulas with solved examples', type: 'note', fileType: 'pdf', downloads: 745 },
-    { yearOrder: 7, semOrder: 2, subject: 'Coding-Decoding', title: 'Coding-Decoding Tricks', description: 'Pattern recognition techniques', type: 'video', fileType: 'mp4', downloads: 543 },
-    { yearOrder: 7, semOrder: 3, subject: 'Reading Comprehension', title: 'RC Practice Set', description: '50 RC passages with answers', type: 'paper', fileType: 'pdf', downloads: 623 },
+  // ENTC
+  { branch: 'ENTC', yearOrder: 1, semOrder: 1, subject: 'Basic Electronics', title: 'Basic Electronics Notes', description: 'Diodes, transistors, and amplifiers', type: 'note', fileType: 'pdf', downloads: 312 },
+  { branch: 'ENTC', yearOrder: 2, semOrder: 1, subject: 'Signals & Systems', title: 'Signals & Systems Paper 2024', description: 'Previous year question paper', type: 'paper', fileType: 'pdf', downloads: 267 },
+
+  // Mechanical
+  { branch: 'MECH', yearOrder: 1, semOrder: 1, subject: 'Engineering Drawing', title: 'Engineering Drawing Manual', description: 'Orthographic & isometric projections', type: 'note', fileType: 'pdf', downloads: 198 },
+  { branch: 'MECH', yearOrder: 2, semOrder: 1, subject: 'Fluid Mechanics', title: 'Fluid Mechanics Solved Problems', description: 'Solved examples with theory', type: 'note', fileType: 'pdf', downloads: 234 },
+
+  // Civil
+  { branch: 'CIVIL', yearOrder: 1, semOrder: 2, subject: 'Surveying I', title: 'Surveying Practical Notes', description: 'Chain, compass & plane table surveying', type: 'note', fileType: 'pdf', downloads: 156 },
+  { branch: 'CIVIL', yearOrder: 2, semOrder: 1, subject: 'Structural Analysis I', title: 'Structural Analysis Paper 2024', description: 'End semester examination paper', type: 'paper', fileType: 'pdf', downloads: 189 },
 ];
 
 // ─── Main ──────────────────────────────────────────────────────────────────
 
 async function seed() {
-    try {
-        await connectDB();
-        console.log('🌱 Seeding database...');
+  try {
+    await connectDB();
+    console.log('🌱 Seeding branch-aware database...');
 
-        // Clear existing data
-        await Promise.all([
-            Year.deleteMany({}),
-            Semester.deleteMany({}),
-            Subject.deleteMany({}),
-            Resource.deleteMany({}),
-        ]);
-        console.log('   Cleared existing data');
+    // Clear existing data
+    await Promise.all([
+      Branch.deleteMany({}),
+      Year.deleteMany({}),
+      Semester.deleteMany({}),
+      Subject.deleteMany({}),
+      Resource.deleteMany({}),
+    ]);
+    console.log('   Cleared existing data');
 
-        // 1. Create years
-        const createdYears = await Year.insertMany(yearsData);
-        console.log(`   ✅ Created ${createdYears.length} years`);
+    // 1. Create branches
+    const createdBranches = await Branch.insertMany(branchesData);
+    console.log(`   ✅ Created ${createdBranches.length} branches`);
 
-        // Build lookup { order → _id }
-        const yearMap = {};
-        createdYears.forEach((y) => { yearMap[y.order] = y._id; });
+    // Build lookup { code → branch }
+    const branchMap = {};
+    createdBranches.forEach((b) => { branchMap[b.code] = b; });
 
-        // 2. Create semesters / topics for each year
-        const allSemesters = [];
-        // Map yearOrder → topic data
-        const topicDataByOrder = {
-            5: dsaTopicsData,
-            6: programmingTopicsData,
-            7: aptitudeTopicsData,
-        };
-        for (const year of createdYears) {
-            const topics = topicDataByOrder[year.order];
-            if (topics) {
-                // Non-academic year: use topic-specific data
-                for (const topic of topics) {
-                    allSemesters.push({ ...topic, yearId: year._id });
-                }
-            } else {
-                // Academic year: use Semester 1 / Semester 2
-                for (const sem of semestersData) {
-                    allSemesters.push({ ...sem, yearId: year._id });
-                }
-            }
-        }
-        const createdSemesters = await Semester.insertMany(allSemesters);
-        console.log(`   ✅ Created ${createdSemesters.length} semesters/topics`);
-
-        // Build lookup { "yearOrder-semOrder" → semester._id }
-        const semMap = {};
-        createdSemesters.forEach((s) => {
-            const yearDoc = createdYears.find((y) => y._id.equals(s.yearId));
-            if (yearDoc) {
-                semMap[`${yearDoc.order}-${s.order}`] = s._id;
-            }
-        });
-
-        // 3. Create subjects
-        const allSubjects = [];
-        for (const [key, names] of Object.entries(subjectsMap)) {
-            const [yearOrder, semOrder] = key.split('-').map(Number);
-            const yearId = yearMap[yearOrder];
-            const semesterId = semMap[`${yearOrder}-${semOrder}`];
-            if (!yearId || !semesterId) continue;
-
-            for (const name of names) {
-                allSubjects.push({
-                    name,
-                    code: name.substring(0, 3).toUpperCase() + yearOrder + semOrder,
-                    description: '',
-                    yearId,
-                    semesterId,
-                });
-            }
-        }
-        const createdSubjects = await Subject.insertMany(allSubjects);
-        console.log(`   ✅ Created ${createdSubjects.length} subjects`);
-
-        // Build lookup { "yearOrder-semOrder-subjectName" → subject._id }
-        const subjMap = {};
-        createdSubjects.forEach((s) => {
-            const yearDoc = createdYears.find((y) => y._id.equals(s.yearId));
-            const semDoc = createdSemesters.find((sem) => sem._id.equals(s.semesterId));
-            if (yearDoc && semDoc) {
-                subjMap[`${yearDoc.order}-${semDoc.order}-${s.name}`] = s._id;
-            }
-        });
-
-        // 4. Create sample resources
-        const resourceDocs = sampleResources.map((r) => {
-            const yearId = yearMap[r.yearOrder];
-            const semesterId = semMap[`${r.yearOrder}-${r.semOrder}`];
-            const subjectId = subjMap[`${r.yearOrder}-${r.semOrder}-${r.subject}`];
-
-            const isVideo = r.type === 'video';
-            const sampleUrl = isVideo 
-                ? 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4'
-                : 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf';
-
-            return {
-                title: r.title,
-                description: r.description,
-                type: r.type,
-                fileUrl: sampleUrl,
-                previewUrl: sampleUrl,
-                publicId: '',
-                fileSize: 0,
-                fileType: r.fileType,
-                yearId,
-                semesterId,
-                subjectId,
-                downloads: r.downloads,
-            };
-        }).filter((r) => r.yearId && r.semesterId && r.subjectId);
-
-        const createdResources = await Resource.insertMany(resourceDocs);
-        console.log(`   ✅ Created ${createdResources.length} resources`);
-
-        console.log('\n🎉 Seed complete!');
-        process.exit(0);
-    } catch (err) {
-        console.error('❌ Seed failed:', err);
-        process.exit(1);
+    // 2. Create years for each branch
+    const allYears = [];
+    for (const branch of createdBranches) {
+      for (const year of yearsData) {
+        allYears.push({ ...year, branchId: branch._id });
+      }
     }
+    const createdYears = await Year.insertMany(allYears);
+    console.log(`   ✅ Created ${createdYears.length} years`);
+
+    // Build lookup { "branchCode-yearOrder" → year._id }
+    const yearMap = {};
+    for (const year of createdYears) {
+      const branch = createdBranches.find((b) => b._id.equals(year.branchId));
+      if (branch) yearMap[`${branch.code}-${year.order}`] = year._id;
+    }
+
+    // 3. Create semesters for each year
+    const allSemesters = [];
+    for (const year of createdYears) {
+      const branch = createdBranches.find((b) => b._id.equals(year.branchId));
+      for (const sem of semestersData) {
+        allSemesters.push({ ...sem, yearId: year._id, branchId: year.branchId });
+      }
+    }
+    const createdSemesters = await Semester.insertMany(allSemesters);
+    console.log(`   ✅ Created ${createdSemesters.length} semesters`);
+
+    // Build lookup { "branchCode-yearOrder-semOrder" → semester._id }
+    const semMap = {};
+    for (const sem of createdSemesters) {
+      const year = createdYears.find((y) => y._id.equals(sem.yearId));
+      const branch = createdBranches.find((b) => b._id.equals(sem.branchId));
+      if (year && branch) semMap[`${branch.code}-${year.order}-${sem.order}`] = sem._id;
+    }
+
+    // 4. Create subjects
+    const allSubjects = [];
+    for (const [key, names] of Object.entries(subjectsMap)) {
+      const parts = key.split('-');
+      const branchCode = parts[0];
+      const yearOrder = parseInt(parts[1]);
+      const semOrder = parseInt(parts[2]);
+
+      const branch = branchMap[branchCode];
+      const yearId = yearMap[`${branchCode}-${yearOrder}`];
+      const semesterId = semMap[`${branchCode}-${yearOrder}-${semOrder}`];
+
+      if (!branch || !yearId || !semesterId) {
+        console.warn(`   ⚠️  Skipping subjects for key ${key} – missing references`);
+        continue;
+      }
+
+      for (const name of names) {
+        allSubjects.push({
+          name,
+          code: name.substring(0, 3).toUpperCase() + branchCode + yearOrder + semOrder,
+          description: '',
+          yearId,
+          semesterId,
+          branchId: branch._id,
+        });
+      }
+    }
+    const createdSubjects = await Subject.insertMany(allSubjects);
+    console.log(`   ✅ Created ${createdSubjects.length} subjects`);
+
+    // Build lookup { "branchCode-yearOrder-semOrder-subjectName" → { _id, yearId, semesterId, branchId } }
+    const subjMap = {};
+    for (const subj of createdSubjects) {
+      const year = createdYears.find((y) => y._id.equals(subj.yearId));
+      const sem = createdSemesters.find((s) => s._id.equals(subj.semesterId));
+      const branch = createdBranches.find((b) => b._id.equals(subj.branchId));
+      if (year && sem && branch) {
+        subjMap[`${branch.code}-${year.order}-${sem.order}-${subj.name}`] = subj;
+      }
+    }
+
+    // 5. Create sample resources
+    const sampleUrl = 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf';
+    const videoUrl  = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4';
+
+    const resourceDocs = sampleResources.map((r) => {
+      const key = `${r.branch}-${r.yearOrder}-${r.semOrder}-${r.subject}`;
+      const subj = subjMap[key];
+      if (!subj) {
+        console.warn(`   ⚠️  No subject found for resource: ${key}`);
+        return null;
+      }
+
+      return {
+        title: r.title,
+        description: r.description,
+        type: r.type,
+        fileUrl: r.type === 'video' ? videoUrl : sampleUrl,
+        previewUrl: r.type === 'video' ? videoUrl : sampleUrl,
+        publicId: '',
+        fileSize: 0,
+        fileType: r.fileType,
+        branchId: subj.branchId,
+        yearId: subj.yearId,
+        semesterId: subj.semesterId,
+        subjectId: subj._id,
+        downloads: r.downloads,
+      };
+    }).filter(Boolean);
+
+    const createdResources = await Resource.insertMany(resourceDocs);
+    console.log(`   ✅ Created ${createdResources.length} resources`);
+
+    console.log('\n🎉 Branch-aware seed complete!');
+    process.exit(0);
+  } catch (err) {
+    console.error('❌ Seed failed:', err);
+    process.exit(1);
+  }
 }
 
 seed();
