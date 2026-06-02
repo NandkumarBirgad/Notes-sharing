@@ -52,7 +52,7 @@ const subjectsMap = {
   'CE-1-2': ['Mathematics 2', 'PPS (C Language)', 'IT Workshop (HTML, CSS, JavaScript)', 'Chemistry', 'IKS', 'Mechanics'],
   'CE-2-1': ['Mathematics 3', 'Java', 'Data Structures', 'Discrete Mathematics', 'EEE'],
   'CE-2-2': ['CAO', 'DAA', 'Python', 'Signal System', 'E-Business', 'PNS'],
-  'CE-3-1': ['DBMS', 'Software Engineering', 'HCI', 'Buisiness Communication', 'Theory of Computation'],
+  'CE-3-1': ['DBMS', 'Software Engineering', 'HCI', 'Business Communication', 'Theory of Computation'],
   'CE-3-2': ['Computer Networks', 'Compiler Design', 'Employability Skill Development', 'IoT', 'Machine Learning'],
   'CE-4-1': ['Deep Learning', 'Distributed Systems', 'Cyber Security', 'Project Work I', 'Elective I'],
   'CE-4-2': ['Project Work II', 'Elective II', 'Elective III', 'Seminar', 'Internship'],

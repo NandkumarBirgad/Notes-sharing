@@ -37,7 +37,7 @@ export const subjects: Record<string, string[]> = {
   '2-3': ['Mathematics 3', 'Java', 'Data Structures', 'Discrete Mathematics', 'EEE'],
   '2-4': ['CAO', 'DAA', 'Python', 'Signal System', 'E-Business', 'PNS'],
   // 3rd Year
-  '3-5': ['DBMS', 'Software Engineering', 'HCI', 'Buisiness Communication', 'Theory of Computation'],
+  '3-5': ['DBMS', 'Software Engineering', 'HCI', 'Business Communication', 'Theory of Computation'],
   '3-6': ['Computer Networks', 'Compiler Design', 'Employability Skill Development', 'IoT', 'Machine Learning'],
 };
 
