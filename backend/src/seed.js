@@ -48,7 +48,7 @@ const semestersData = [
 // Key: "branchCode-yearOrder-semOrder"
 const subjectsMap = {
   // Computer Engineering
-  'CE-1-1': ['Mathematics I', 'Physics', 'Chemistry', 'English', 'Programming in C'],
+  'CE-1-1': ['Mathematics I', 'physics apply science 1', 'Engineering Graphics', 'Modern Indian Language', 'BEE'],
   'CE-1-2': ['Mathematics II', 'Engineering Drawing', 'Data Structures', 'Digital Electronics', 'Environmental Science'],
   'CE-2-1': ['Discrete Mathematics', 'Object-Oriented Programming', 'Computer Organization', 'Database Management', 'Operating Systems'],
   'CE-2-2': ['Software Engineering', 'Computer Networks', 'Theory of Computation', 'Web Technologies', 'Statistics'],
