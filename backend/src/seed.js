@@ -47,13 +47,13 @@ const semestersData = [
 // ─── Subjects per Branch + Year + Semester ─────────────────────────────────
 // Key: "branchCode-yearOrder-semOrder"
 const subjectsMap = {
-  // Computer Engineering
-  'CE-1-1': ['Mathematics I', 'physics apply science 1', 'Engineering Graphics', 'Modern Indian Language', 'BEE'],
-  'CE-1-2': ['Mathematics II', 'Engineering Drawing', 'Data Structures', 'Digital Electronics', 'Environmental Science'],
-  'CE-2-1': ['Discrete Mathematics', 'Object-Oriented Programming', 'Computer Organization', 'Database Management', 'Operating Systems'],
-  'CE-2-2': ['Software Engineering', 'Computer Networks', 'Theory of Computation', 'Web Technologies', 'Statistics'],
-  'CE-3-1': ['Compiler Design', 'Machine Learning', 'Information Security', 'Cloud Computing', 'Mobile App Development'],
-  'CE-3-2': ['Artificial Intelligence', 'Big Data Analytics', 'IoT', 'Blockchain', 'Natural Language Processing'],
+  // Computer Science & Engineering
+  'CE-1-1': ['Mathematics 1', 'Basic Electrical Engineering', 'Engineering Graphics', 'Modern Indian Language', 'Physics Applied Science 1'],
+  'CE-1-2': ['Mathematics 2', 'PPS (C Language)', 'IT Workshop (HTML, CSS, JavaScript)', 'Chemistry', 'IKS', 'Mechanics'],
+  'CE-2-1': ['Mathematics 3', 'Java', 'Data Structures', 'Discrete Mathematics', 'EEE'],
+  'CE-2-2': ['CAO', 'DAA', 'Python', 'Signal System', 'E-Business', 'PNS'],
+  'CE-3-1': ['DBMS', 'Software Engineering', 'HCI', 'Buisiness Communication', 'Theory of Computation'],
+  'CE-3-2': ['Computer Networks', 'Compiler Design', 'Employability Skill Development', 'IoT', 'Machine Learning'],
   'CE-4-1': ['Deep Learning', 'Distributed Systems', 'Cyber Security', 'Project Work I', 'Elective I'],
   'CE-4-2': ['Project Work II', 'Elective II', 'Elective III', 'Seminar', 'Internship'],
 
@@ -110,16 +110,16 @@ const subjectsMap = {
 
 // ─── Sample Resources ──────────────────────────────────────────────────────
 const sampleResources = [
-  // Computer Engineering
-  { branch: 'CE', yearOrder: 1, semOrder: 1, subject: 'Mathematics I', title: 'Linear Algebra Notes', description: 'Complete notes on vectors, matrices, and eigenvalues', type: 'note', fileType: 'pdf', downloads: 234 },
-  { branch: 'CE', yearOrder: 1, semOrder: 1, subject: 'Physics', title: 'Physics Mid-term 2024', description: 'Mid-semester examination paper with solutions', type: 'paper', fileType: 'pdf', downloads: 189 },
-  { branch: 'CE', yearOrder: 1, semOrder: 1, subject: 'Programming in C', title: 'C Programming Basics', description: 'Introduction to C programming fundamentals', type: 'video', fileType: 'mp4', downloads: 412 },
-  { branch: 'CE', yearOrder: 1, semOrder: 2, subject: 'Data Structures', title: 'Data Structures Handbook', description: 'Arrays, linked lists, trees, and graphs', type: 'note', fileType: 'pdf', downloads: 567 },
-  { branch: 'CE', yearOrder: 2, semOrder: 1, subject: 'Database Management', title: 'DBMS Complete Notes', description: 'Relational algebra, SQL, normalization', type: 'note', fileType: 'pdf', downloads: 321 },
-  { branch: 'CE', yearOrder: 2, semOrder: 1, subject: 'Operating Systems', title: 'OS Final Exam 2024', description: 'End-semester examination paper', type: 'paper', fileType: 'pdf', downloads: 276 },
-  { branch: 'CE', yearOrder: 2, semOrder: 1, subject: 'Object-Oriented Programming', title: 'OOP with Java Tutorial', description: 'Complete Java OOP concepts', type: 'video', fileType: 'mp4', downloads: 498 },
-  { branch: 'CE', yearOrder: 3, semOrder: 1, subject: 'Machine Learning', title: 'ML Algorithms Guide', description: 'Regression, classification, clustering', type: 'note', fileType: 'pdf', downloads: 612 },
-  { branch: 'CE', yearOrder: 3, semOrder: 2, subject: 'Artificial Intelligence', title: 'AI Mid-term 2024', description: 'Search algorithms, knowledge representation', type: 'paper', fileType: 'pdf', downloads: 198 },
+  // Computer Science & Engineering
+  { branch: 'CE', yearOrder: 1, semOrder: 1, subject: 'Mathematics 1', title: 'Mathematics 1 Complete Notes', description: 'Linear algebra, calculus, and matrix operations', type: 'note', fileType: 'pdf', downloads: 234 },
+  { branch: 'CE', yearOrder: 1, semOrder: 1, subject: 'Physics Applied Science 1', title: 'Physics Applied Science Mid-term 2024', description: 'Mid-semester examination paper with solutions', type: 'paper', fileType: 'pdf', downloads: 189 },
+  { branch: 'CE', yearOrder: 1, semOrder: 2, subject: 'PPS (C Language)', title: 'C Programming Basics', description: 'Introduction to C programming fundamentals', type: 'video', fileType: 'mp4', downloads: 412 },
+  { branch: 'CE', yearOrder: 1, semOrder: 2, subject: 'IT Workshop (HTML, CSS, JavaScript)', title: 'Web Development Workshop Notes', description: 'HTML structure, CSS styling, and JavaScript basics', type: 'note', fileType: 'pdf', downloads: 567 },
+  { branch: 'CE', yearOrder: 2, semOrder: 1, subject: 'Data Structures', title: 'Data Structures Handbook', description: 'Arrays, linked lists, trees, and graphs', type: 'note', fileType: 'pdf', downloads: 321 },
+  { branch: 'CE', yearOrder: 2, semOrder: 1, subject: 'Java', title: 'OOP with Java Tutorial', description: 'Complete Java OOP concepts and programming', type: 'video', fileType: 'mp4', downloads: 498 },
+  { branch: 'CE', yearOrder: 2, semOrder: 2, subject: 'Python', title: 'Python Programming Notes', description: 'Python fundamentals, data types, and OOP', type: 'note', fileType: 'pdf', downloads: 276 },
+  { branch: 'CE', yearOrder: 3, semOrder: 1, subject: 'DBMS', title: 'DBMS Complete Notes', description: 'Relational algebra, SQL, normalization', type: 'note', fileType: 'pdf', downloads: 612 },
+  { branch: 'CE', yearOrder: 3, semOrder: 2, subject: 'Machine Learning', title: 'ML Algorithms Guide', description: 'Regression, classification, clustering', type: 'note', fileType: 'pdf', downloads: 198 },
   { branch: 'CE', yearOrder: 4, semOrder: 1, subject: 'Deep Learning', title: 'Deep Learning Intro', description: 'Neural networks, CNNs, RNNs', type: 'video', fileType: 'mp4', downloads: 387 },
 
   // Information Technology
@@ -151,6 +151,16 @@ async function seed() {
   try {
     await connectDB();
     console.log('🌱 Seeding branch-aware database...');
+
+    // Drop stale unique indexes that may conflict with branch-aware data
+    try {
+      await mongoose.connection.collection('years').dropIndex('name_1');
+      console.log('   Dropped stale years.name_1 index');
+    } catch (_) { /* index doesn't exist – that's fine */ }
+    try {
+      await mongoose.connection.collection('semesters').dropIndex('name_1');
+      console.log('   Dropped stale semesters.name_1 index');
+    } catch (_) { /* index doesn't exist – that's fine */ }
 
     // Clear existing data
     await Promise.all([

@@ -23,17 +23,22 @@ export const years = [
 export const semesters = [
   { id: 1, label: 'Semester 1' },
   { id: 2, label: 'Semester 2' },
+  { id: 3, label: 'Semester 3' },
+  { id: 4, label: 'Semester 4' },
+  { id: 5, label: 'Semester 5' },
+  { id: 6, label: 'Semester 6' },
 ];
 
 export const subjects: Record<string, string[]> = {
-  '1-1': ['Mathematics I', 'Physics', 'Chemistry', 'English', 'Programming in C'],
-  '1-2': ['Mathematics II', 'Engineering Drawing', 'Data Structures', 'Digital Electronics', 'Environmental Science'],
-  '2-1': ['Discrete Mathematics', 'Object-Oriented Programming', 'Computer Organization', 'Database Management', 'Operating Systems'],
-  '2-2': ['Software Engineering', 'Computer Networks', 'Theory of Computation', 'Web Technologies', 'Human Computer Interaction'],
-  '3-1': ['Database Management Systems', 'Machine Learning', 'Information Security', 'Cloud Computing', 'Mobile App Development'],
-  '3-2': ['Compiler Design', 'Machine Learning', 'IoT', 'Computer Networking', 'Employebility skills'],
-  '4-1': ['Deep Learning', 'Distributed Systems', 'Cyber Security', 'Project Work I', 'Elective I'],
-  '4-2': ['Project Work II', 'Elective II', 'Elective III', 'Seminar', 'Internship'],
+  // 1st Year
+  '1-1': ['Mathematics 1', 'Basic Electrical Engineering', 'Engineering Graphics', 'Modern Indian Language', 'Physics Applied Science 1'],
+  '1-2': ['Mathematics 2', 'PPS (C Language)', 'IT Workshop (HTML, CSS, JavaScript)', 'Chemistry', 'IKS', 'Mechanics'],
+  // 2nd Year
+  '2-3': ['Mathematics 3', 'Java', 'Data Structures', 'Discrete Mathematics', 'EEE'],
+  '2-4': ['CAO', 'DAA', 'Python', 'Signal System', 'E-Business', 'PNS'],
+  // 3rd Year
+  '3-5': ['DBMS', 'Software Engineering', 'HCI', 'Buisiness Communication', 'Theory of Computation'],
+  '3-6': ['Computer Networks', 'Compiler Design', 'Employability Skill Development', 'IoT', 'Machine Learning'],
 };
 
 export const mockMaterials: StudyMaterial[] = [
